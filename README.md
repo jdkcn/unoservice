@@ -10,17 +10,28 @@ by multiple requestors to perform the necessary conversions.
 To build, run:
 
 ```shell
-$ docker build --rm -t unoconv .
+docker build --rm -t unoconv .
 ```
 
 To start the container, run:
 
 ```shell
-docker run -p 3000:3000 --mount type=tmpfs,destination=/tmp -ti unoconv
+docker run -it -m 512m \
+  --name unoservice -p 3000:3000 \
+  --tmpfs /tmp unoconv
+```
+
+You can use your custom fonts dir for add extra fonts, run:
+
+```shell
+docker run -m 512m -i -t -d -p 3000:3000  \
+  --restart=always --name unoservice \
+  --tmpfs /tmp \
+  -v /data/unoservice/fonts:/usr/share/fonts/truetype/custom unoconv
 ```
 
 Now, files can be sent to the service:
 
 ```shell
-curl -o out.pdf -F format=pdf -F 'file=@mydoc.doc' http://localhost:3000/convert
+curl -o mydoc.pdf -F format=pdf -F 'file=@mydoc.docx' http://localhost:3000/convert
 ```
